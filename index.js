@@ -9,4 +9,5 @@ const server = createServer((req, res) => {
 
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    console.log(`this is a test for automate`)
 });
