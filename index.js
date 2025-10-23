@@ -11,12 +11,19 @@ function getGreeting() {
     return 'Good evening! 🌙';
 }
 
+// New function to log request info
+function logRequest(req) {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+}
+
 const server = createServer((req, res) => {
+    logRequest(req); // log each request
+    const currentTime = new Date().toLocaleString();
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end(`Hello from Node.js app!\n${getGreeting()}\n`);
+    res.end(`Hello from Node.js app!\n${getGreeting()}\nCurrent time: ${currentTime}\n`);
 });
 
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`Jenkins automation test: Greeting function added`);
+    console.log(`Jenkins automation test: Greeting and logging function added`);
 });
