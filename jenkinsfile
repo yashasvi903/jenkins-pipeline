@@ -1,41 +1,60 @@
-pipeline{
+pipeline {
     agent any
 
-    stages {
-        stage ('Checkout') {
-            steps {
-                git branch: 'jenkinspipeline', url: 'https://github.com/yashasvi903/jenkins-pipeline.git'
+   // environment {
+        // Optional: Store your Discord webhook as a Jenkins credential (ID = discord-webhook)
+     //   DISCORD_WEBHOOK = credentials('discord-webhook')
+  //  }
 
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "Checking out source code..."
+                git branch: 'jenkinspipeline', url: 'https://github.com/yashasvi903/jenkins-pipeline.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
+                echo "Installing npm dependencies..."
                 sh 'npm install'
             }
         }
 
         stage('Test') {
-            steps{
-                sh 'echo "No tests yet!"'
+            steps {
+                echo "Running automated tests..."
+                sh 'npm test'
             }
         }
 
-        stage('Deploy') {
-            steps{
-                sh """
-
-                pkill -f index.js || true
-                nohup node index.js > app.log 2>&1 &
-                """
+        stage('Build & Deploy') {
+            when {
+                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+            }
+            steps {
+                echo "Building and deploying Node.js app..."
+                sh '''
+                    pkill -f index.js || true
+                    nohup node index.js > app.log 2>&1 &
+                '''
             }
         }
     }
 
     post {
+        success {
+            echo "Build and deployment successful."
+            // Uncomment below if you want Discord notifications
+            // sh 'curl -H "Content-Type: application/json" -d \'{"content":"Jenkins build succeeded."}\' $DISCORD_WEBHOOK'
+        }
+        failure {
+            echo "Build failed."
+            // Uncomment below to send Discord failure alerts
+            // sh 'curl -H "Content-Type: application/json" -d \'{"content":"Jenkins build failed. Check logs."}\' $DISCORD_WEBHOOK'
+        }
         always {
-            echo 'pipeline completed'
+            echo "Pipeline completed."
         }
     }
 }
-
