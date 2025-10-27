@@ -1,9 +1,9 @@
-import { createServer } from 'http';
-import os from 'os'; // ✅ 1. New import: to show system info
+const http = require('http');
+const os = require('os');
 
 const PORT = process.env.PORT || 3000;
 
-// ✅ 2. Enhanced greeting with username (if available)
+// Function to generate a greeting message
 function getGreeting() {
     const date = new Date();
     const hours = date.getHours();
@@ -14,12 +14,12 @@ function getGreeting() {
     return `Good evening, ${username}!`;
 }
 
-// Log each request
+// Log request info
 function logRequest(req) {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
 }
 
-// Get random motivational quote
+// Generate a random quote
 function getRandomQuote() {
     const quotes = [
         "Keep calm and code on.",
@@ -32,7 +32,7 @@ function getRandomQuote() {
     return quotes[Math.floor(Math.random() * quotes.length)];
 }
 
-// ✅ 3. Added function to show system statistics
+// Get system stats
 function getSystemInfo() {
     return {
         platform: os.platform(),
@@ -43,11 +43,11 @@ function getSystemInfo() {
     };
 }
 
-// Track uptime and requests
+// Track server uptime and request count
 const serverStartTime = Date.now();
 let requestCount = 0;
 
-// ✅ 4. Added health check endpoint
+// Health check endpoint
 function handleHealthCheck(req, res) {
     const uptimeSeconds = Math.floor((Date.now() - serverStartTime) / 1000);
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -59,11 +59,11 @@ function handleHealthCheck(req, res) {
     }, null, 2));
 }
 
-const server = createServer((req, res) => {
+// Create HTTP server
+const server = http.createServer((req, res) => {
     logRequest(req);
     requestCount++;
 
-    // ✅ 5. Added multiple endpoints
     if (req.url === '/stats') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
@@ -80,20 +80,20 @@ const server = createServer((req, res) => {
         return;
     }
 
-    // Default route
     const message = `
-        Hello from Node.js App
-        ${getGreeting()}
-        Time: ${new Date().toLocaleString()}
-        Quote: ${getRandomQuote()}
-        Requests: ${requestCount}
-    `;
+Hello from Node.js App
+${getGreeting()}
+Time: ${new Date().toLocaleString()}
+Quote: ${getRandomQuote()}
+Requests: ${requestCount}
+`;
 
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end(message);
 });
 
+// Start the server
 server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Jenkins automation test: Added health, system info, and personalized greeting`);
+    console.log(`Server running successfully on port ${PORT}`);
+    console.log(`Jenkins build ready: app deployed with health and stats endpoints`);
 });
